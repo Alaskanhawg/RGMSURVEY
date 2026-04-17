@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RGM Conference 2026 — Feedback Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a18; line-height: 1.6; padding: 2rem 1rem; }
+  .page { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 2.5rem; box-shadow: 0 2px 24px rgba(0,0,0,0.08); }
+  .report-header { margin-bottom: 2rem; border-bottom: 0.5px solid #ddd; padding-bottom: 1.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .report-header h1 { font-size: 22px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+  .report-header p { font-size: 13px; color: #888; }
+  .year-badge { background: #ddeaf7; color: #185FA5; font-size: 12px; font-weight: 500; padding: 4px 14px; border-radius: 20px; white-space: nowrap; align-self: flex-start; margin-top: 4px; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin: 0 0 10px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric-card { background: #f5f4f0; border-radius: 8px; padding: 14px 16px; }
+  .metric-label { font-size: 12px; color: #666; margin: 0 0 4px; }
+  .metric-val { font-size: 26px; font-weight: 500; color: #1a1a18; margin: 0; line-height: 1.1; }
+  .metric-sub { font-size: 11px; color: #aaa; margin: 2px 0 0; }
+  .chart-card { background: #fff; border: 0.5px solid #e0e0e0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .chart-title { font-size: 14px; font-weight: 500; color: #1a1a18; margin: 0 0 14px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bar-label { font-size: 12px; color: #666; width: 210px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; background: #f0efeb; border-radius: 3px; height: 10px; }
+  .bar-fill { height: 10px; border-radius: 3px; }
+  .bar-val { font-size: 12px; font-weight: 500; color: #444; min-width: 32px; text-align: right; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .donut-wrap { display: flex; align-items: center; gap: 16px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .legend-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .divider { border: none; border-top: 0.5px solid #e8e8e4; margin: 1.5rem 0; }
+  .tab-bar { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .tab-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 0.5px solid #ccc; background: transparent; color: #666; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .tab-btn:hover { background: #f0efeb; }
+  .tab-btn.active { background: #ddeaf7; color: #185FA5; border-color: transparent; font-weight: 500; }
+  .quote-list { display: flex; flex-direction: column; gap: 8px; }
+  .quote-item { background: #f5f4f0; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #1a1a18; line-height: 1.6; }
+  .quote-category { font-size: 10px; font-weight: 500; color: #aaa; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .highlight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .highlight-card { background: #f5f4f0; border-radius: 8px; padding: 12px 14px; }
+  .highlight-title { font-size: 11px; font-weight: 500; color: #aaa; margin: 0 0 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .highlight-text { font-size: 13px; color: #1a1a18; line-height: 1.5; margin: 0; }
+  .dist-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .dist-star { font-size: 11px; color: #888; width: 14px; text-align: right; flex-shrink: 0; }
+  .dist-track { flex: 1; background: #f0efeb; border-radius: 3px; height: 8px; }
+  .dist-fill { height: 8px; border-radius: 3px; }
+  .dist-count { font-size: 11px; color: #aaa; min-width: 20px; text-align: right; }
+  .footer { margin-top: 2rem; padding-top: 1rem; border-top: 0.5px solid #e8e8e4; font-size: 12px; color: #aaa; text-align: center; }
+  @media (max-width: 600px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .highlight-grid { grid-template-columns: 1fr; }
+    .bar-label { width: 120px; }
+    .page { padding: 1.5rem 1rem; }
+    .report-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="report-header">
+    <div>
+      <h1>RGM Conference — Feedback Report</h1>
+      <p>36 anonymous respondents &nbsp;·&nbsp; All ratings on a 1–5 scale</p>
+    </div>
+    <span class="year-badge">2026 &nbsp;·&nbsp; Final</span>
+  </div>
+
+  <p class="section-label">At a glance</p>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-label">Respondents</p>
+      <p class="metric-val">36</p>
+      <p class="metric-sub">100% anonymous</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Overall experience</p>
+      <p class="metric-val">4.58<span style="font-size:14px;color:#aaa">/5</span></p>
+      <p class="metric-sub">avg rating</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Role relevance</p>
+      <p class="metric-val">4.67<span style="font-size:14px;color:#aaa">/5</span></p>
+      <p class="metric-sub">avg rating</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Awards dinner</p>
+      <p class="metric-val">4.50<span style="font-size:14px;color:#aaa">/5</span></p>
+      <p class="metric-sub">avg rating</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Karaoke afterparty</p>
+      <p class="metric-val">4.49<span style="font-size:14px;color:#aaa">/5</span></p>
+      <p class="metric-sub">avg rating</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Gave 5 stars overall</p>
+      <p class="metric-val">67%</p>
+      <p class="metric-sub">24 of 36</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <p class="section-label">Ratings by category</p>
+
+  <div class="chart-card">
+    <p class="chart-title">Average score — all categories</p>
+    <div id="ratings-bars"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <p class="chart-title">Overall experience — distribution</p>
+      <div id="overall-dist"></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <p class="chart-title">Food & beverage — distribution</p>
+      <div id="food-dist"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <p class="section-label">Breakout sessions & engagement</p>
+
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <p class="chart-title">Most valuable breakout session</p>
+      <div class="donut-wrap">
+        <canvas id="donutChart" width="100" height="100" role="img" aria-label="Donut chart: All Equally 50%, Financials 28%, Guest Phanatics 11%, People 11%">All Equally 50%, Financials 28%, Guest Phanatics 11%, People 11%.</canvas>
+        <div class="donut-legend">
+          <div class="legend-row"><span class="legend-dot" style="background:#1D9E75"></span>All equally — 50%</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#185FA5"></span>Financials — 28%</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#BA7517"></span>Guest Phanatics — 11%</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#993556"></span>People — 11%</div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <p class="chart-title">Afterparty peer connection</p>
+      <div id="connect-bars"></div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:10px">
+    <p class="chart-title">Plus-one experience</p>
+    <div id="plusone-bars"></div>
+  </div>
+
+  <hr class="divider">
+  <p class="section-label">Open-ended responses</p>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('fav')">Favorite parts</button>
+    <button class="tab-btn" onclick="showTab('improve')">Improvements</button>
+    <button class="tab-btn" onclick="showTab('topics')">Suggested topics</button>
+    <button class="tab-btn" onclick="showTab('other')">Other comments</button>
+  </div>
+
+  <div id="tab-fav" class="quote-list">
+    <div class="quote-item">"I loved seeing all of the GMs together. It's not often that I get to see everyone as more than a number on the top ten and bottom ten list — it was nice to see people as their face and their hard work rather than a numerical value."</div>
+    <div class="quote-item">"The time to break out in smaller groups so questions could be answered more personally"</div>
+    <div class="quote-item">"How the groups were randomly selected, and seeing other people's perspectives"</div>
+    <div class="quote-item">"Greeting and mingling with peers from other locations" — peer networking was a top theme</div>
+    <div class="quote-item">"Engaging with other store GMs" / "Getting together with other GMs"</div>
+    <div class="quote-item">"Seeing everyone away from their store and meeting new teammates"</div>
+    <div class="quote-item">"Learning more about the business side. It's really helpful."</div>
+    <div class="quote-item">"The learning — ways to improve my store"</div>
+    <div class="quote-item">"Dinner — because everyone came together"</div>
+    <div class="quote-item">"The award ceremony" / "Recognition" — multiple respondents</div>
+    <div class="quote-item">"Karaoke" — cited by multiple respondents as a standalone highlight</div>
+    <div class="quote-item">"Being able to have my spouse there. A dancing area would have been nice."</div>
+  </div>
+
+  <div id="tab-improve" class="quote-list" style="display:none">
+    <div class="quote-item">"Peer introductions — do a breakout where we meet the GMs of other locations and areas. Introduce the ADs, their areas and backgrounds. Create connection, not just competition."</div>
+    <div class="quote-item">"Cut off GMs that get off on a tangent and take over discussions" / "Getting people who speak a lot to calm down so people who really need to listen can listen more"</div>
+    <div class="quote-item">"I would like it if the classes were more classes and less of a semester review"</div>
+    <div class="quote-item">"30 minutes per session is not enough time to learn. Longer training sessions."</div>
+    <div class="quote-item">"2 days instead of 1" — extend the conference to two days</div>
+    <div class="quote-item">"Awards for most improvement overall scores, categories such as best yearly avg, CP, etc."</div>
+    <div class="quote-item">"Type of venue" / "The place where the event took place" — venue was flagged by multiple</div>
+    <div class="quote-item">"Room for a dance floor. A more formal atmosphere."</div>
+    <div class="quote-item">"Catering / the food" — food quality mentioned by several respondents</div>
+    <div class="quote-item">"Free drinks lol"</div>
+    <div class="quote-item">"Mandatory karaoke"</div>
+  </div>
+
+  <div id="tab-topics" class="quote-list" style="display:none">
+    <div class="quote-item"><div class="quote-category">Financials & P&L (most requested)</div>"Going over various financial reports and where the numbers come from. Also 30 minutes per session is not enough time to learn."</div>
+    <div class="quote-item"><div class="quote-category">Financials & P&L</div>"More P&L breakout sessions in greater detail" / "Go further in depth with P&Ls"</div>
+    <div class="quote-item"><div class="quote-category">Financials & P&L</div>"Focus on how invoices are paid and how they can affect different periods' P&L so we can manage what is coming out and not overspend that month"</div>
+    <div class="quote-item"><div class="quote-category">Financials & P&L</div>"Win Score and Scorecard" / "How Win Score affects overall for the period"</div>
+    <div class="quote-item"><div class="quote-category">Scorecards</div>"5-star Pizza Hut scorecard"</div>
+    <div class="quote-item"><div class="quote-category">Technology</div>"Power BI" — data analytics and reporting tools</div>
+    <div class="quote-item"><div class="quote-category">Career development</div>"Career advancement"</div>
+    <div class="quote-item"><div class="quote-category">Hiring & scheduling</div>"Scheduling and hiring" / "Labor"</div>
+    <div class="quote-item"><div class="quote-category">HR / interviews</div>"Interview questions and guides"</div>
+    <div class="quote-item"><div class="quote-category">Format feedback</div>"I would like it to be more of a class than a semester review"</div>
+  </div>
+
+  <div id="tab-other" class="quote-list" style="display:none">
+    <div class="quote-item">"I appreciate all of y'all's hard work in the planning and organizing that was put into the event."</div>
+    <div class="quote-item">"Was better than going out to a crowded venue — more personal time with team and peers"</div>
+    <div class="quote-item">"Great time — awesome to see familiar faces and meet new faces"</div>
+    <div class="quote-item">"Texas next year" — location suggestion</div>
+    <div class="quote-item">"Classes earlier in the day with a break before the dinner and afterparty for either a nap or exploration of Branson"</div>
+    <div class="quote-item">"The food wasn't the greatest, not to be mean" / "Food was delicious" — split opinions on food</div>
+    <div class="quote-item">"Awesome!" / "Fun" / "Thank you for the experience" — multiple expressions of gratitude</div>
+  </div>
+
+  <hr class="divider">
+  <p class="section-label">Key takeaways</p>
+
+  <div class="highlight-grid">
+    <div class="highlight-card">
+      <p class="highlight-title">Biggest strength</p>
+      <p class="highlight-text">Peer connection was the runaway theme — GMs valued seeing colleagues as people, not just rankings. Random breakout groupings were specifically praised for sparking fresh perspectives.</p>
+    </div>
+    <div class="highlight-card">
+      <p class="highlight-title">Top opportunity</p>
+      <p class="highlight-text">Venue (4.09) and food (3.78) are the two weakest scores. Multiple respondents suggested a location change and better catering. A 2-day format was the most-requested structural change.</p>
+    </div>
+    <div class="highlight-card">
+      <p class="highlight-title">Content demand</p>
+      <p class="highlight-text">P&L depth is far and away the #1 topic request — respondents want more time, more detail, and a true class format rather than a review. Power BI, Win Score, and labor/scheduling also surfaced repeatedly.</p>
+    </div>
+    <div class="highlight-card">
+      <p class="highlight-title">Discussion management</p>
+      <p class="highlight-text">Multiple respondents flagged that some participants dominated discussions. Consider structured facilitation or timed contributions to keep sessions equitable and on track.</p>
+    </div>
+    <div class="highlight-card">
+      <p class="highlight-title">Recognition & awards</p>
+      <p class="highlight-text">The awards ceremony was a top-cited favorite. Consider expanding award categories (most improvement, best yearly avg) to recognize more attendees meaningfully.</p>
+    </div>
+    <div class="highlight-card">
+      <p class="highlight-title">Plus-one & afterparty</p>
+      <p class="highlight-text">21 of 36 said bringing a plus-one enhanced their experience. Of those who attended the afterparty, 28 of 29 reported connecting with peers — only 1 said no.</p>
+    </div>
+  </div>
+
+  <div class="footer">RGM Conference 2026 &nbsp;·&nbsp; Feedback Survey Report &nbsp;·&nbsp; 36 respondents &nbsp;·&nbsp; Final</div>
+</div>
+
+<script>
+function makeBar(containerId, items, color) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = items.map(i => `
+    <div class="bar-row">
+      <span class="bar-label">${i.label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(i.val/5)*100}%;background:${color}"></div></div>
+      <span class="bar-val">${i.val.toFixed(2)}</span>
+    </div>`).join('');
+}
+
+function makeDist(containerId, dist, color) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const maxCount = Math.max(...Object.values(dist));
+  el.innerHTML = [5,4,3,2,1].map(star => {
+    const count = dist[star] || 0;
+    return `<div class="dist-row">
+      <span class="dist-star">${star}</span>
+      <div class="dist-track"><div class="dist-fill" style="width:${maxCount ? (count/maxCount)*100 : 0}%;background:${color}"></div></div>
+      <span class="dist-count">${count}</span>
+    </div>`;
+  }).join('');
+}
+
+makeBar('ratings-bars', [
+  {label:'Role relevance (RGM)', val:4.667},
+  {label:'Overall experience', val:4.583},
+  {label:'Guest Phanatics breakout', val:4.639},
+  {label:'People breakout', val:4.611},
+  {label:'Financials breakout', val:4.528},
+  {label:'Organization & comms', val:4.444},
+  {label:'Flow & pacing', val:4.444},
+  {label:'Awards dinner experience', val:4.500},
+  {label:'Dinner setting & atmosphere', val:4.472},
+  {label:'Karaoke afterparty', val:4.486},
+  {label:'Venue & facilities', val:4.088},
+  {label:'Food & beverage', val:3.778},
+], '#185FA5');
+
+makeDist('overall-dist', {5:24, 4:9, 3:3, 2:0, 1:0}, '#185FA5');
+makeDist('food-dist', {5:15, 4:5, 3:10, 2:5, 1:1}, '#BA7517');
+
+makeBar('connect-bars', [
+  {label:'Yes', val: parseFloat((5*(17/36)).toFixed(2))},
+  {label:'Somewhat', val: parseFloat((5*(11/36)).toFixed(2))},
+  {label:"Didn't attend", val: parseFloat((5*(7/36)).toFixed(2))},
+  {label:'No', val: parseFloat((5*(1/36)).toFixed(2))},
+], '#1D9E75');
+
+makeBar('plusone-bars', [
+  {label:'Yes — enhanced experience', val: parseFloat((5*(21/36)).toFixed(2))},
+  {label:"Didn't bring a plus one", val: parseFloat((5*(14/36)).toFixed(2))},
+  {label:'Somewhat', val: parseFloat((5*(1/36)).toFixed(2))},
+], '#BA7517');
+
+new Chart(document.getElementById('donutChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['All Equally','Financials','Guest Phanatics','People'],
+    datasets: [{
+      data: [18, 10, 4, 4],
+      backgroundColor: ['#1D9E75','#185FA5','#BA7517','#993556'],
+      borderWidth: 0,
+      hoverOffset: 3
+    }]
+  },
+  options: {
+    responsive: false,
+    cutout: '62%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${Math.round(ctx.raw/36*100)}%` } }
+    }
+  }
+});
+
+function showTab(name) {
+  ['fav','improve','topics','other'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'flex' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', ['fav','improve','topics','other'][i] === name);
+  });
+}
+</script>
+</body>
+</html>
